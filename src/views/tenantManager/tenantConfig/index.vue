@@ -23,15 +23,15 @@
           @page-size-change="handleTableWidthChange"
           @page-current-change="handleCurrentChange"
         >
-          <template #status="{ row }">
+          <template #status="{ row }: { row: TenantAPI.TenantList }">
             <el-switch
-              v-model="test1"
+              v-model="row.status"
               :size="size"
               inline-prompt
               class="pure-datatheme"
               :active-text="t('开启')"
               :inactive-text="t('关闭')"
-              @change="testChange"
+              :before-change="() => updateTenantStatus(row)"
               :style="switchStyle"
             />
           </template>
@@ -41,25 +41,16 @@
               link
               type="primary"
               :size="size"
-              @click="openDialog(t('编辑赛事'), row)"
+              @click="openDialog(t('编辑商户'), row)"
             >
               {{ t('编辑') }}
             </el-button>
             <el-button
               class="reset-margin"
               link
-              type="primary"
-              :size="size"
-              @click="openWhitelistDialog(row)"
-            >
-              {{ t('白名单') }}
-            </el-button>
-            <el-button
-              class="reset-margin"
-              link
               type="danger"
               :size="size"
-              @click="openDialog(t('编辑赛事'), row)"
+              @click="delTenantClick(row)"
             >
               {{ t('删除') }}
             </el-button>
@@ -72,16 +63,14 @@
 
 <script setup lang="ts">
 import { PureTableBar } from '@/components/RePureTableBar';
-import { useMemberHook } from './utils/hook';
+import { useTenantHook } from './utils/hook';
 import SearchForm from './component/SearchForm.vue';
 import { t } from '@/plugins/i18n';
 import { usePublicHooks } from '@/hooks';
 
 defineOptions({ name: 'tenantManager' });
 const { tableHeaderStyle } = usePublicHooks();
-const test1 = ref(false);
 const { switchStyle } = usePublicHooks();
-const testChange = () => {};
 
 const {
   loading,
@@ -93,8 +82,9 @@ const {
   handleCurrentChange,
   form,
   openDialog,
-  openWhitelistDialog
-} = useMemberHook();
+  updateTenantStatus,
+  delTenantClick
+} = useTenantHook();
 </script>
 
 <style scoped lang="scss">

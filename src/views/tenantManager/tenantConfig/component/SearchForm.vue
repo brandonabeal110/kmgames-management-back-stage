@@ -6,53 +6,49 @@
       :model="form"
       class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
     >
-      <el-form-item :label="`${t('商户名称')}:`" prop="leagueId">
+      <el-form-item :label="`${t('商户名称')}:`" prop="name">
         <el-select
-          v-model="form.sportId"
+          v-model="form.name"
           :placeholder="t('请选择')"
           clearable
+          filterable
           class="!w-[150px]"
         >
           <el-option
-            :value="item"
-            label="商户一"
-            v-for="item in 3"
-            :key="item"
+            :value="item.name"
+            :label="item.name"
+            v-for="item in tenantList"
+            :key="item.id"
           />
         </el-select>
       </el-form-item>
 
-      <el-form-item :label="`${t('商户编号/ID')}:`" prop="sportId">
+      <el-form-item :label="`${t('商户编号/ID')}:`" prop="tenantCode">
         <el-input
-          v-model="form.leagueNameCn"
+          v-model="form.tenantCode"
           :placeholder="t('请输入商户编号/ID')"
           clearable
-          :formatter="v => formatNumber(v)"
+          maxlength="50"
           v-enter="search"
           class="!w-[150px]"
         />
       </el-form-item>
 
-      <el-form-item :label="`${t('商户类型')}:`" prop="leagueId">
-        <el-select
-          v-model="form.sportId"
-          :placeholder="t('全部类型')"
-          clearable
-          class="!w-[150px]"
-        >
-          <el-option value="-1" :label="t('全部')"></el-option>
+      <el-form-item :label="`${t('商户类型')}:`" prop="tenantType">
+        <el-select v-model="form.tenantType" clearable class="!w-[150px]">
+          <el-option :value="' '" :label="t('全部')"></el-option>
           <el-option
-            :value="item"
-            :label="`代理商-${item}`"
-            v-for="item in 3"
-            :key="item"
+            :value="item.key"
+            :label="item.val"
+            v-for="item in TENANT_TYPE"
+            :key="item.key"
           />
         </el-select>
       </el-form-item>
 
-      <el-form-item :label="`${t('商户对接人')}:`" prop="sportId">
+      <el-form-item :label="`${t('商户对接人')}:`" prop="contact">
         <el-input
-          v-model="form.leagueNameCn"
+          v-model="form.contact"
           :placeholder="t('请输入商户对接人')"
           clearable
           v-enter="search"
@@ -96,20 +92,36 @@ import Refresh from '@iconify-icons/ep/refresh';
 import Search from '@iconify-icons/ep/search';
 import type { FormInstance } from 'element-plus';
 import { SearchFormType } from '../utils/types';
-import { formatNumber } from '@/utils/formatNumber';
-// import { useMatchStore } from '@/store/match';
+import { TENANT_TYPE } from '../utils/map';
+import dayjs from 'dayjs';
 
-defineProps<{
+const props = defineProps<{
   loading: boolean;
   form: SearchFormType;
 }>();
 
-// const matchStore = useMatchStore();
 const formRef = ref<FormInstance>();
 const selectDate = ref('');
 const emits = defineEmits(['onSearch']);
+const tenantList = reactive<TenantAPI.getAllSimplifiedTenant[]>([]);
+
+onMounted(() => {
+  initAccountList();
+});
+
+//- 获取账号列表
+const initAccountList = async () => {
+  const res = await API.getAllSimplifiedTenants();
+  if (res.code) return;
+  tenantList.length = 0;
+  tenantList.push(...res.data);
+};
+
 const resetForm = (formEl: FormInstance | undefined) => {
   formEl.resetFields();
+  props.form.createdAtStart = '';
+  props.form.createdAtEnd = '';
+  selectDate.value = '';
   search();
 };
 
@@ -117,7 +129,16 @@ const search = () => {
   emits('onSearch', ...['reload']);
 };
 
-const changeDate = () => {};
+const changeDate = t => {
+  if (!t) {
+    props.form.createdAtStart = '';
+    props.form.createdAtEnd = '';
+  } else {
+    props.form.createdAtStart = dayjs(t[0]).startOf('day').valueOf();
+    props.form.createdAtEnd = dayjs(t[1]).endOf('day').valueOf();
+  }
+  search();
+};
 </script>
 
 <style scoped></style>
