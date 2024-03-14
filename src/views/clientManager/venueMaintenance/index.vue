@@ -39,7 +39,7 @@ import { columns } from './component/TableColumnList';
 import { t } from '@/plugins/i18n';
 import { usePublicHooks } from '@/hooks';
 
-defineOptions({ name: 'SYSTEMCONFIG_MAINTAINMANAGER' });
+defineOptions({ name: 'CLIENTMANAGER_VENUEACCESSCONTROL' });
 
 const { tableHeaderStyle, switchStyle } = usePublicHooks();
 const { loading, dataList, onSearch, updateUserStatus } = useMaintainHook();

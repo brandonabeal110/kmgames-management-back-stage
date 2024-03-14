@@ -85,7 +85,7 @@ import { t } from '@/plugins/i18n';
 import { usePublicHooks } from '@/hooks';
 import { hasAuth } from '@/router/utils';
 
-defineOptions({ name: 'MEMBER' });
+defineOptions({ name: 'CLIENTMANAGER_VENUEACCESSCONTROL_REGIONWHITELIST' });
 const { tableHeaderStyle } = usePublicHooks();
 const { switchStyle } = usePublicHooks();
 
